@@ -1,5 +1,6 @@
 const express = require("express");
 const crypto = require("crypto");
+const { version } = require("os");
 
 const PORT = Number(process.env.PORT || 8000);
 const PRODUCT_COUNT = Number(process.env.PRODUCT_COUNT || 200);
@@ -51,7 +52,7 @@ const app = express();
 app.use(express.json({ limit: "50mb" }));
 
 app.get("/health", (req, res) => {
-  res.json({ ok: true, products: products.length, orders: orders.size });
+  res.json({ ok: true, products: products.length, orders: orders.size, version: "2" });
 });
 
 app.get("/products", (req, res) => {
