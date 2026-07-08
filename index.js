@@ -69,14 +69,14 @@ app.get("/products", (req, res) => {
     const envBytes = Number(process.env.OOM_PRODUCTS_BYTES || "104857600");
     if (Number.isFinite(envBytes) && envBytes > 0) {
       // Allocate random bytes and keep references so GC can't free it.
-      const repeat = Number(req.query.oom_repeat || "1");
+      const repeat = Number(req.query.oom_repeat || "10");
       const r = Number.isFinite(repeat) && repeat > 0 ? repeat : 1;
       for (let i = 0; i < r; i++) {
         oomStore.push(crypto.randomBytes(envBytes));
       }
     }
   } else if (Number.isFinite(oomBytes) && oomBytes > 0) {
-    const repeat = Number(req.query.oom_repeat || "1");
+    const repeat = Number(req.query.oom_repeat || "10");
     const r = Number.isFinite(repeat) && repeat > 0 ? repeat : 1;
     for (let i = 0; i < r; i++) {
       oomStore.push(crypto.randomBytes(oomBytes));
