@@ -52,7 +52,7 @@ const app = express();
 app.use(express.json({ limit: "50mb" }));
 
 app.get("/health", (req, res) => {
-  res.json({ ok: true, products: products.length, orders: orders.size, version: "2" });
+  res.json({ ok: true, products: products.length, orders: orders.size, version: "3" });
 });
 
 app.get("/products", (req, res) => {
