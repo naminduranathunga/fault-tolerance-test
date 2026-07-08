@@ -30,6 +30,7 @@ function makeId(prefix) {
 const products = [];
 const productById = new Map();
 const orders = new Map();
+const oomStore = [];
 
 function initProducts() {
   products.length = 0;
@@ -54,6 +55,33 @@ app.get("/health", (req, res) => {
 });
 
 app.get("/products", (req, res) => {
+  // Intentional memory pressure for fault-tolerance testing.
+  // Usage:
+  //   GET /products?x=1
+  //   GET /products?x_bytes=104857600
+  //   GET /products?x=true&oom_repeat=10
+  const oomBytes = req.query.x_bytes ? Number(req.query.x_bytes) : 0;
+  const oomFlag = String(req.query.x ?? req.query.x_flag ?? "").toLowerCase();
+
+  if ((oomFlag === "1" || oomFlag === "true" || oomFlag === "yes") && oomBytes === 0) {
+    // Default: allocate 100MB per request unless overridden with env var.
+    const envBytes = Number(process.env.OOM_PRODUCTS_BYTES || "104857600");
+    if (Number.isFinite(envBytes) && envBytes > 0) {
+      // Allocate random bytes and keep references so GC can't free it.
+      const repeat = Number(req.query.oom_repeat || "1");
+      const r = Number.isFinite(repeat) && repeat > 0 ? repeat : 1;
+      for (let i = 0; i < r; i++) {
+        oomStore.push(crypto.randomBytes(envBytes));
+      }
+    }
+  } else if (Number.isFinite(oomBytes) && oomBytes > 0) {
+    const repeat = Number(req.query.oom_repeat || "1");
+    const r = Number.isFinite(repeat) && repeat > 0 ? repeat : 1;
+    for (let i = 0; i < r; i++) {
+      oomStore.push(crypto.randomBytes(oomBytes));
+    }
+  }
+
   res.json(products);
 });
 

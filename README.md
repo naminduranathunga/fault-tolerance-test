@@ -47,6 +47,12 @@ Returns:
 ]
 ```
 
+For fault-tolerance testing, you can intentionally trigger memory pressure:
+
+- `GET /products?oom=1` (allocates `OOM_PRODUCTS_BYTES` env var; default `100MB`)
+- `GET /products?oom_bytes=104857600&oom_repeat=10`
+- Memory is held in-process (not released) to force OOM under enough requests.
+
 ### `POST /order`
 
 Body:
